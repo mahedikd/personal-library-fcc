@@ -49,7 +49,7 @@ module.exports = function (app) {
 
     .delete(function (req, res) {
       //if successful response will be 'complete delete successful'
-      BookModel.remove({}, (err, data) => {
+      BookModel.deleteMany({}, (err, data) => {
         if (err) {
           res.send('could not delete');
         } else {
@@ -68,7 +68,7 @@ module.exports = function (app) {
       }
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
       BookModel.findById(bookid, (err, data) => {
-        if (err) {
+        if (err||!data) {
           res.send('no book exists');
         } else {
           res.json(data);
@@ -76,7 +76,7 @@ module.exports = function (app) {
       });
     })
 
-    .post(function (req, res) {
+    .post(async function (req, res) {
       let bookid = req.params.id;
       let comment = req.body.comment;
       //json res format same as .get
@@ -84,22 +84,25 @@ module.exports = function (app) {
         res.send('missing required field comment');
         return;
       }
-      BookModel.findByIdAndUpdate(
+      BookModel.findById(
         bookid,
-        { $push: { comments: comment } },
-        (err, data) => {
-          if (err) {
+        (err, bookData) => {
+          if (err || !bookData) {
             res.send('no book exists');
           } else {
-            const { _id, title, comments } = data;
-            res.json({
-              _id,
-              title,
-              commentcount: comments.length,
-            });
+          bookData.comments.push(comment);
+					bookData.save((err,savedData)=>{
+						res.json({
+							comments: savedData.comments,
+							_id: savedData._id,
+							title: savedData.title,
+							commentcount: savedData.comments.length
+						})
+					})
           }
         },
       );
+		
     })
 
     .delete(function (req, res) {
@@ -110,7 +113,7 @@ module.exports = function (app) {
         return;
       }
       BookModel.findByIdAndDelete(bookid, (err, data) => {
-        if (err) {
+        if (err || !data) {
           res.send('no book exists');
         } else {
           res.send('delete successful');
