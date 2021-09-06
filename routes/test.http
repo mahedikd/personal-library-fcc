@@ -1,0 +1,28 @@
+POST {{URL}}
+Content-type: application/x-www-form-urlencoded
+
+title='ballll9'
+
+##
+POST {{URL}}
+Content-type: application/x-www-form-urlencoded
+
+title='kde'
+
+##
+GET {{URL}}
+
+##
+DELETE {{URL}}
+
+##
+GET http://localhost:3434/api/books/613641cff3d12e732ef8ed73
+
+##
+POST http://localhost:3434/api/books/613641cff3d12e732ef8ed73
+Content-type: application/x-www-form-urlencoded
+
+comment=nai
+##
+DELETE http://localhost:3434/api/books/613641cff3d12e732ef8ed73
+
